@@ -1,38 +1,46 @@
 package ie.setu.fooddiary
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.navigation.NavigationView
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseUser
 import ie.setu.fooddiary.databinding.ActivityMainBinding
+import ie.setu.fooddiary.databinding.NavHeaderMainBinding
+import ie.setu.fooddiary.ui.login.LoggedInViewModel
+import ie.setu.fooddiary.ui.login.LoginActivity
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var homeBinding: ActivityMainBinding
+    private lateinit var navHeaderBinding: NavHeaderMainBinding
+    private lateinit var loggedInViewModel: LoggedInViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
+        homeBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(homeBinding.root)
 
-        binding.appBarMain.fab.setOnClickListener { view ->
+        setSupportActionBar(homeBinding.appBarMain.toolbar)
+
+        homeBinding.appBarMain.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
+        val drawerLayout: DrawerLayout = homeBinding.drawerLayout
+        val navView: NavigationView = homeBinding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -54,5 +62,34 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        loggedInViewModel = ViewModelProvider(this)[LoggedInViewModel::class.java]
+        loggedInViewModel.liveFirebaseUser.observe(this) { firebaseUser ->
+            if (firebaseUser != null) {
+                updateNavHeader(loggedInViewModel.liveFirebaseUser.value!!)
+            }
+        }
+        loggedInViewModel.loggedOut.observe(this) { loggedOut ->
+            if (loggedOut) {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
+        }
+    }
+
+    private fun updateNavHeader(currentUser: FirebaseUser) {
+        val headerView = homeBinding.navView.getHeaderView(0)
+        navHeaderBinding = NavHeaderMainBinding.bind(headerView)
+        navHeaderBinding.navHeaderEmail.text = currentUser.email
+        navHeaderBinding.navHeaderName.text = getString(R.string.nav_header_title, currentUser.displayName)
+    }
+
+    fun signOut(item: MenuItem) {
+        loggedInViewModel.logOut()
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 }
