@@ -13,7 +13,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseUser
 import ie.setu.fooddiary.databinding.ActivityMainBinding
 import ie.setu.fooddiary.databinding.NavHeaderMainBinding
@@ -35,10 +34,6 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(homeBinding.appBarMain.toolbar)
 
-        homeBinding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
         val drawerLayout: DrawerLayout = homeBinding.drawerLayout
         val navView: NavigationView = homeBinding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -83,10 +78,11 @@ class MainActivity : AppCompatActivity() {
         val headerView = homeBinding.navView.getHeaderView(0)
         navHeaderBinding = NavHeaderMainBinding.bind(headerView)
         navHeaderBinding.navHeaderEmail.text = currentUser.email
-        navHeaderBinding.navHeaderName.text = getString(R.string.nav_header_title, currentUser.displayName)
+        navHeaderBinding.navHeaderName.text =
+            getString(R.string.nav_header_title, currentUser.displayName)
     }
 
-    fun signOut(item: MenuItem) {
+    fun signOut(@Suppress("UNUSED_PARAMETER") item: MenuItem) {
         loggedInViewModel.logOut()
         val intent = Intent(this, LoginActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)

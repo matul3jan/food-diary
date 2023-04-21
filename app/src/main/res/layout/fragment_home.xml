@@ -1,22 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/text_home"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Map fragment -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/map_fragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            tools:layout="@android:layout/simple_gallery_item" />
+
+        <!-- Autocomplete fragment -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/autocomplete_fragment"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/map_fragment"
+            tools:ignore="MissingConstraints"
+            tools:layout="@android:layout/simple_gallery_item" />
+
+        <EditText
+            android:id="@+id/dish_name_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/autocomplete_fragment"
+            android:layout_marginTop="0dp"
+            android:hint="@string/enter_the_name_of_the_dish"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="20dp"
+            android:autofillHints="dish name" />
+
+        <Spinner
+            android:id="@+id/cuisine_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dish_name_edittext"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/spinner_border"
+            android:entries="@array/cuisines"
+            android:padding="20dp" />
+
+        <RatingBar
+            android:id="@+id/rating_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cuisine_spinner"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="1" />
+
+        <EditText
+            android:id="@+id/comment_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@+id/rating_bar"
+            android:layout_alignParentStart="true"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_bg"
+            android:hint="@string/how_was_your_experience"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:padding="20dp"
+            android:scrollbarStyle="insideInset"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:scrollbars="vertical"
+            android:autofillHints="Comments" />
+
+        <ImageView
+            android:id="@+id/imgView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_below="@+id/comment_edittext"
+            android:contentDescription="@string/dish_image_preview" />
+
+        <!-- Image upload button -->
+        <Button
+            android:id="@+id/upload_image_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imgView"
+            android:layout_alignParentStart="true"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/button_bg"
+            android:text="@string/upload_image"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <!-- Save button -->
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/upload_image_button"
+            android:layout_alignParentStart="true"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/button_bg"
+            android:text="@string/save"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+</ScrollView>
