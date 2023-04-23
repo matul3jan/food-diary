@@ -33,26 +33,26 @@
                 app:srcCompat="@drawable/ic_image_placeholder" />
 
             <TextView
-                android:id="@+id/paymentAmount"
-                android:layout_width="87dp"
+                android:id="@+id/restaurantName"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="15dp"
                 android:layout_toEndOf="@+id/imageIcon"
                 android:text="@{experience.restaurantName}"
-                android:textSize="24sp" />
+                android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/paymentMethod"
-                android:layout_width="88dp"
+                android:id="@+id/dishName"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="17dp"
                 android:layout_marginTop="15dp"
-                android:layout_toEndOf="@+id/paymentAmount"
+                android:layout_toEndOf="@+id/restaurantName"
                 android:text="@{experience.dishName}"
-                android:textSize="24sp" />
+                android:textSize="18sp" />
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

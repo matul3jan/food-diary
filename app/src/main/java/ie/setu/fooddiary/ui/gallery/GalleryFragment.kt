@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.widget.SearchView
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -29,6 +30,8 @@ class GalleryFragment : Fragment(), ExperienceClickListener {
     lateinit var loader: AlertDialog
     private val viewModel: GalleryViewModel by activityViewModels()
     private val loggedInViewModel: LoggedInViewModel by activityViewModels()
+
+    private lateinit var filteredExperiences: MutableList<ExperienceModel>
 
     companion object {
         @JvmStatic
@@ -54,12 +57,17 @@ class GalleryFragment : Fragment(), ExperienceClickListener {
 
         showLoader(loader, "Downloading experiences")
 
+        filteredExperiences =
+            (viewModel.observableExperienceList.value
+                ?: mutableListOf()) as MutableList<ExperienceModel>
+
         viewModel.observableExperienceList.observe(viewLifecycleOwner) {
             render(it)
             hideLoader(loader)
             checkSwipeRefresh()
         }
 
+        setSearchHandler()
         setSwipeRefresh()
         setAddHandler()
         setDeleteHandler()
@@ -82,6 +90,32 @@ class GalleryFragment : Fragment(), ExperienceClickListener {
             binding.recyclerView.visibility = View.VISIBLE
             binding.experiencesNotFound.visibility = View.GONE
         }
+    }
+
+    private fun filterExperiences(query: String) {
+        filteredExperiences.clear()
+        for (experience in viewModel.observableExperienceList.value!!) {
+            if (experience.restaurantName.contains(query, true) ||
+                experience.dishName.contains(query, true)
+            ) {
+                filteredExperiences.add(experience)
+            }
+        }
+        render(filteredExperiences)
+    }
+
+    private fun setSearchHandler() {
+        binding.searchView.queryHint = "Search here..."
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let { filterExperiences(it) }
+                return true
+            }
+        })
     }
 
     private fun setAddHandler() {
