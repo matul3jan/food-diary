@@ -54,6 +54,7 @@ class LoginActivity : AppCompatActivity() {
         loginRegisterViewModel.liveFirebaseUser.observe(this) {
             if (it != null) {
                 startActivity(Intent(this, MainActivity::class.java))
+                finish()
             }
         }
         loginRegisterViewModel.firebaseAuthManager.errorStatus.observe(this) {
@@ -70,6 +71,7 @@ class LoginActivity : AppCompatActivity() {
                 loginRegisterViewModel.googleSignIn(result) { success ->
                     if (success) {
                         startActivity(Intent(this, MainActivity::class.java))
+                        finish()
                     } else {
                         Toast.makeText(this, getString(R.string.auth_failed), Toast.LENGTH_LONG)
                             .show()
