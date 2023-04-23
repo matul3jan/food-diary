@@ -3,7 +3,6 @@ package ie.setu.fooddiary.ui.home
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -17,6 +16,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -42,6 +43,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private var imageUri: Uri? = null
     private var experienceModel: ExperienceModel = ExperienceModel()
     private val loggedInViewModel: LoggedInViewModel by activityViewModels()
+    private val args: HomeFragmentArgs by navArgs()
 
     private lateinit var viewModel: HomeViewModel
 
@@ -55,6 +57,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         viewModel.observableStatus.observe(viewLifecycleOwner) { render(it) }
 
+        if (args.experience != null) {
+            fillExistingExperience(args.experience!!)
+        }
+
         // Google Maps
         Places.initialize(requireContext(), getString(R.string.google_maps_key))
         val mapFrag = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -67,6 +73,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         setUploadImageHandler()
 
         return binding.root
+    }
+
+    private fun fillExistingExperience(experience: ExperienceModel) {
+        experienceModel = experience.copy()
+        binding.dishNameEdittext.setText(experience.dishName)
+        binding.ratingBar.rating = experience.rating
+        binding.commentEdittext.setText(experience.comment)
+        binding.cuisineSpinner.setSelection(
+            resources.getStringArray(R.array.cuisines).indexOf(experience.cuisine)
+        )
+        renderImage(experience.imageUrl)
     }
 
     private fun render(status: Boolean) {
@@ -105,6 +122,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         )
 
         autocompleteFragment.setCountries("IE")
+        autocompleteFragment.setTypesFilter(
+            listOf(
+                "bakery",
+                "restaurant",
+                "meal_takeaway",
+                "meal_delivery"
+            )
+        )
 
         autocompleteFragment.setOnPlaceSelectedListener(
             placeSelectionListener(
@@ -119,6 +144,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 autocompleteFragment.setText("")
                 resetMap(googleMap)
             }
+
+        val experience = args.experience
+        if (experience != null) {
+            val latLng = LatLng(experience.latitude, experience.longitude)
+            val markerOptions = MarkerOptions().position(latLng).title(experience.restaurantName)
+            googleMap.clear()
+            googleMap.addMarker(markerOptions)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            autocompleteFragment.setText(experience.restaurantName)
+        }
     }
 
     private fun placeSelectionListener(
@@ -127,7 +162,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     ) = object : PlaceSelectionListener {
         override fun onPlaceSelected(place: Place) {
 
-            val placeText = "${place.name}, ${place.address}"
+            val placeText = place.name!!
 
             experienceModel.restaurantName = placeText
             experienceModel.latitude = place.latLng?.latitude!!
@@ -171,24 +206,19 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
             // Upload image to Firebase storage and then save the url (for Firebase database)
             viewModel.uploadImage(imageUri) { imageUrl ->
-                experienceModel.imageUrl = imageUrl
-                viewModel.addExperience(loggedInViewModel.liveFirebaseUser, experienceModel)
-
-                // Clear values
-                binding.cuisineSpinner.setSelection(0)
-                binding.ratingBar.rating = 0F
-                binding.dishNameEdittext.text.clear()
-                binding.commentEdittext.text.clear()
-
-                // Clear image
-                binding.imgView.setImageBitmap(null)
-                binding.imgView.layoutParams.height = 0
-                binding.imgView.requestLayout()
-
-                // Reset map
-                val clearBtn =
-                    requireView().findViewById<View>(com.google.android.libraries.places.R.id.places_autocomplete_clear_button)
-                clearBtn.callOnClick()
+                if (args.experience != null) {
+                    // Edit existing experience
+                    experienceModel.uid = args.experience?.uid
+                    if (imageUrl.isNotEmpty() && args.experience?.imageUrl != imageUrl) {
+                        experienceModel.imageUrl = imageUrl
+                    }
+                    viewModel.editExperience(loggedInViewModel.liveFirebaseUser, experienceModel)
+                } else {
+                    // Add new experience
+                    experienceModel.imageUrl = imageUrl
+                    viewModel.addExperience(loggedInViewModel.liveFirebaseUser, experienceModel)
+                }
+                clearValues()
             }
         }
     }
@@ -214,21 +244,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val pickImageLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-
                     imageUri = result.data?.data!!
-
-                    val bitmap = ImageDecoder.decodeBitmap(
-                        ImageDecoder.createSource(
-                            requireContext().contentResolver, imageUri!!
-                        )
-                    )
-                    binding.imgView.setImageBitmap(bitmap)
-                    binding.imgView.layoutParams.height = 500
+                    renderImage(imageUri.toString())
                 } else {
-                    binding.imgView.layoutParams.height = 0
+                    renderImage("")
                 }
-
-                binding.imgView.requestLayout()
             }
 
         binding.uploadImageButton.setOnClickListener {
@@ -256,6 +276,30 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             }
             builder.show()
         }
+    }
+
+    private fun renderImage(imageUrl: String) {
+        Glide.with(this)
+            .load(imageUrl)
+            .placeholder(R.drawable.ic_image_placeholder) // placeholder
+            .error(R.drawable.ic_image_error) // error image if load fails
+            .into(binding.imgView)
+    }
+
+    private fun clearValues() {
+        // Clear values
+        binding.cuisineSpinner.setSelection(0)
+        binding.ratingBar.rating = 0F
+        binding.dishNameEdittext.text.clear()
+        binding.commentEdittext.text.clear()
+
+        // Clear image
+        renderImage("")
+
+        // Reset map
+        val clearBtn =
+            requireView().findViewById<View>(com.google.android.libraries.places.R.id.places_autocomplete_clear_button)
+        clearBtn?.callOnClick()
     }
 
     override fun onDestroyView() {

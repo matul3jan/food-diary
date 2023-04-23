@@ -80,5 +80,7 @@
         <item>Vietnamese</item>
     </string-array>
 
+    <string name="experiencesNotFound">No Experiences Yet…\nGo add a Experience!</string>
+    <string name="messageLoading">Please Wait while the Experiences are Loading</string>
 
 </resources>
