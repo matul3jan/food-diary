@@ -74,13 +74,17 @@ object FirebaseDBManager : ExperienceStore {
         database.updateChildren(childAdd)
     }
 
-    override fun delete(userId: String, experienceId: String) {
+    override fun delete(userId: String, experienceId: String, imageUrl: String) {
 
         val childDelete: MutableMap<String, Any?> = HashMap()
         childDelete["/experiences/$experienceId"] = null
         childDelete["/user-experiences/$userId/$experienceId"] = null
 
         database.updateChildren(childDelete)
+
+        if (imageUrl.isNotEmpty()) {
+            deleteImage(imageUrl)
+        }
     }
 
     override fun update(userId: String, experienceId: String, experience: ExperienceModel) {
@@ -88,6 +92,9 @@ object FirebaseDBManager : ExperienceStore {
         val experienceValues = experience.toMap()
 
         val childUpdate: MutableMap<String, Any?> = HashMap()
+        println("-----------------------------------------------------------------------------------------------")
+        println("experiences/$experienceId")
+        println("user-experiences/$userId/$experienceId")
         childUpdate["experiences/$experienceId"] = experienceValues
         childUpdate["user-experiences/$userId/$experienceId"] = experienceValues
 
@@ -114,6 +121,17 @@ object FirebaseDBManager : ExperienceStore {
             }.addOnFailureListener { e ->
                 callback.invoke("")
                 Timber.e("Error uploading image to firebase storage: ${e.message}")
+            }
+    }
+
+    private fun deleteImage(imageUrl: String) {
+        val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+        storageRef.delete()
+            .addOnSuccessListener {
+                Timber.e("Success deleting image from Firebase Storage")
+            }
+            .addOnFailureListener {
+                Timber.e("Error deleting image from Firebase Storage: ${it.message}")
             }
     }
 }

@@ -25,6 +25,18 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    fun editExperience(
+        firebaseUser: MutableLiveData<FirebaseUser>,
+        experience: ExperienceModel,
+    ) {
+        status.value = try {
+            FirebaseDBManager.update(firebaseUser.value?.uid!!, experience.uid!!, experience)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
     fun uploadImage(uri: Uri?, callback: (imageUrl: String) -> Unit) {
         FirebaseDBManager.upload(uri, callback)
     }
