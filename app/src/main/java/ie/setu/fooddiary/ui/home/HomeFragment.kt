@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,6 +28,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import ie.setu.fooddiary.MainActivity
 import ie.setu.fooddiary.R
 import ie.setu.fooddiary.databinding.FragmentHomeBinding
 import ie.setu.fooddiary.models.ExperienceModel
@@ -43,7 +43,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private var imageUri: Uri? = null
     private var experienceModel: ExperienceModel = ExperienceModel()
     private val loggedInViewModel: LoggedInViewModel by activityViewModels()
-    private val args: HomeFragmentArgs by navArgs()
+    private var args: HomeFragmentArgs? = null
 
     private lateinit var viewModel: HomeViewModel
 
@@ -57,10 +57,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         viewModel.observableStatus.observe(viewLifecycleOwner) { render(it) }
 
-        if (args.experience != null) {
-            fillExistingExperience(args.experience!!)
-        }
-
         // Google Maps
         Places.initialize(requireContext(), getString(R.string.google_maps_key))
         val mapFrag = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -73,6 +69,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         setUploadImageHandler()
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        args = HomeFragmentArgs.fromBundle(requireArguments())
+        if (args?.experience != null) {
+            fillExistingExperience(args!!.experience!!)
+            (requireActivity() as MainActivity).supportActionBar?.title = "Edit Experience"
+        } else {
+            (requireActivity() as MainActivity).supportActionBar?.title = "Add Experience"
+        }
     }
 
     private fun fillExistingExperience(experience: ExperienceModel) {
@@ -99,7 +106,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 Toast.LENGTH_LONG
             ).show()
         }
-        experienceModel = ExperienceModel() // reset
+        // Reset
+        experienceModel = ExperienceModel()
+        (requireActivity() as MainActivity).supportActionBar?.title = "Add Experience"
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -145,7 +154,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 resetMap(googleMap)
             }
 
-        val experience = args.experience
+        val experience = args?.experience
         if (experience != null) {
             val latLng = LatLng(experience.latitude, experience.longitude)
             val markerOptions = MarkerOptions().position(latLng).title(experience.restaurantName)
@@ -206,10 +215,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
             // Upload image to Firebase storage and then save the url (for Firebase database)
             viewModel.uploadImage(imageUri) { imageUrl ->
-                if (args.experience != null) {
+                if (args?.experience != null) {
                     // Edit existing experience
-                    experienceModel.uid = args.experience?.uid
-                    if (imageUrl.isNotEmpty() && args.experience?.imageUrl != imageUrl) {
+                    experienceModel.uid = args?.experience?.uid
+                    if (imageUrl.isNotEmpty() && args?.experience?.imageUrl != imageUrl) {
                         experienceModel.imageUrl = imageUrl
                     }
                     viewModel.editExperience(loggedInViewModel.liveFirebaseUser, experienceModel)
@@ -304,6 +313,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.observableStatus.removeObservers(viewLifecycleOwner)
+        args = null
         _binding = null
     }
 }
