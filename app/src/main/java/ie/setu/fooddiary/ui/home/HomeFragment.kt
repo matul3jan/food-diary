@@ -1,8 +1,10 @@
 package ie.setu.fooddiary.ui.home
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -32,7 +34,9 @@ import ie.setu.fooddiary.R
 import ie.setu.fooddiary.databinding.FragmentHomeBinding
 import ie.setu.fooddiary.models.ExperienceModel
 import ie.setu.fooddiary.ui.login.LoggedInViewModel
+import ie.setu.fooddiary.utils.getImageUri
 import ie.setu.fooddiary.utils.resetMap
+import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 import java.util.*
 
@@ -251,8 +255,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val pickImageLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    imageUri = result.data?.data!!
-                    renderImage(imageUri.toString())
+                    if (result.data?.data != null) {
+                        imageUri = result.data?.data!!
+                        renderImage(imageUri.toString())
+                    } else {
+                        @Suppress("DEPRECATION")
+                        val image = result.data?.extras?.get("data") as Bitmap
+                        imageUri = getImageUri(requireContext(), image)
+                        renderBitmap(image)
+                    }
                 } else {
                     renderImage("")
                 }
@@ -266,9 +277,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             builder.setItems(options) { dialog, item ->
                 when {
                     options[item] == "Take Photo" -> {
-                        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        if (takePictureIntent.resolveActivity(requireContext().packageManager) != null) {
+                        if (EasyPermissions.hasPermissions(
+                                requireContext(),
+                                Manifest.permission.CAMERA
+                            )
+                        ) {
+                            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                             pickImageLauncher.launch(takePictureIntent)
+                        } else {
+                            EasyPermissions.requestPermissions(
+                                this,
+                                "Camera permission is required to take a picture",
+                                100,
+                                Manifest.permission.CAMERA
+                            )
                         }
                     }
                     options[item] == "Choose from Gallery" -> {
@@ -288,6 +310,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun renderImage(imageUrl: String) {
         Glide.with(this)
             .load(imageUrl)
+            .placeholder(R.drawable.ic_image_placeholder) // placeholder
+            .error(R.drawable.ic_image_error) // error image if load fails
+            .into(binding.imgView)
+    }
+
+    private fun renderBitmap(bitmap: Bitmap?) {
+        Glide.with(this)
+            .load(bitmap)
             .placeholder(R.drawable.ic_image_placeholder) // placeholder
             .error(R.drawable.ic_image_error) // error image if load fails
             .into(binding.imgView)
