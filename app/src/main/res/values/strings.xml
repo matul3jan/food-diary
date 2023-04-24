@@ -10,6 +10,8 @@
     <string name="menu_home">Add Experience</string>
     <string name="menu_gallery">My Experiences</string>
     <string name="menu_slideshow">Explore</string>
+    <string name="menu_theme">Theme</string>
+    <string name="menu_dark_mode">Dark mode</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

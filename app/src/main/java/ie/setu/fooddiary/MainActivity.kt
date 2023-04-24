@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -19,6 +20,9 @@ import ie.setu.fooddiary.databinding.ActivityMainBinding
 import ie.setu.fooddiary.databinding.NavHeaderMainBinding
 import ie.setu.fooddiary.ui.login.LoggedInViewModel
 import ie.setu.fooddiary.ui.login.LoginActivity
+import ie.setu.fooddiary.utils.Theme
+import ie.setu.fooddiary.utils.applyTheme
+import ie.setu.fooddiary.utils.isSystemInDarkMode
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +50,24 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         Places.initialize(applicationContext, getString(R.string.google_maps_key))
+
+        handleThemeToggle()
+    }
+
+    private fun handleThemeToggle() {
+
+        val switch =
+            homeBinding.navView.menu.findItem(R.id.nav_dark_mode).actionView as SwitchCompat
+
+        switch.isChecked = isSystemInDarkMode()
+
+        switch.setOnClickListener {
+            if (switch.isChecked) {
+                applyTheme(Theme.DARK)
+            } else {
+                applyTheme(Theme.LIGHT)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

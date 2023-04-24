@@ -1,6 +1,7 @@
 package ie.setu.fooddiary.utils
 
 import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -46,4 +47,19 @@ fun fitMarkersInMap(markers: MutableList<Marker?>, map: GoogleMap) {
     val padding = 200 // offset from edges of the map in pixels
     val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
     map.animateCamera(cu)
+}
+
+fun applyTheme(theme: Theme) {
+    when (theme) {
+        Theme.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        Theme.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+    }
+}
+
+fun isSystemInDarkMode(): Boolean {
+    return when (AppCompatDelegate.getDefaultNightMode()) {
+        AppCompatDelegate.MODE_NIGHT_YES -> true
+        AppCompatDelegate.MODE_NIGHT_NO -> false
+        else -> false
+    }
 }

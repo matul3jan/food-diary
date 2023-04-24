@@ -18,6 +18,7 @@ class LoadingActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
         val user = loginRegisterViewModel.liveFirebaseUser.value
         if (user != null) {
             // User is signed in, Start main activity
