@@ -13,6 +13,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.google.android.libraries.places.api.Places
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
@@ -102,6 +104,16 @@ class MainActivity : AppCompatActivity() {
         navHeaderBinding.navHeaderEmail.text = currentUser.email
         navHeaderBinding.navHeaderName.text =
             getString(R.string.nav_header_title, currentUser.displayName)
+
+        if (currentUser.photoUrl != null) {
+            Glide.with(this)
+                .load(currentUser.photoUrl)
+                .placeholder(R.drawable.ic_image_placeholder) // placeholder
+                .error(R.drawable.ic_image_error) // error image if load fails
+                .override(200, 200)
+                .transform(CircleCrop())
+                .into(navHeaderBinding.imageView)
+        }
     }
 
     fun signOut(@Suppress("UNUSED_PARAMETER") item: MenuItem) {
