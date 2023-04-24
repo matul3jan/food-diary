@@ -21,9 +21,9 @@ class GalleryViewModel : ViewModel() {
     fun load() {
         try {
             FirebaseDBManager.findAll(liveFirebaseUser.value?.uid!!, experienceList)
-            Timber.i("Report Load Success : ${experienceList.value.toString()}")
+            Timber.i("User Experiences Load Success")
         } catch (e: Exception) {
-            Timber.i("Report Load Error : $e.message")
+            Timber.i("User Experiences Load Error : $e.message")
         }
     }
 

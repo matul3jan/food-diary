@@ -1,22 +1,61 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.slideshow.SlideshowFragment">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text_slideshow"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/autocomplete_search_view"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        tools:ignore="MissingConstraints"
+        tools:layout="@android:layout/simple_gallery_item" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:layout="@android:layout/simple_gallery_item" />
+
+    <LinearLayout
+        android:id="@+id/legend_container"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/self_experiences"
+            android:src="@drawable/legend_red_marker" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:text="@string/self_experiences" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/other_s_experiences"
+            android:src="@drawable/legend_blue_marker" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:text="@string/other_s_experiences" />
+
+    </LinearLayout>
+
+</LinearLayout>

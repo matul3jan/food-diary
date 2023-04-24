@@ -12,6 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.libraries.places.api.Places
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
 import ie.setu.fooddiary.databinding.ActivityMainBinding
@@ -37,15 +38,14 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = homeBinding.drawerLayout
         val navView: NavigationView = homeBinding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
-            ), drawerLayout
+            setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        Places.initialize(applicationContext, getString(R.string.google_maps_key))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
