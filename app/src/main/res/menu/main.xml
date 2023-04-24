@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/toggle_experiences"
+        android:checkable="true"
+        android:paddingRight="50dp"
+        android:title="@string/menu_gallery"
+        app:actionViewClass="androidx.appcompat.widget.SwitchCompat"
+        app:showAsAction="ifRoom" />
 </menu>

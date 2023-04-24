@@ -20,4 +20,13 @@ class SlideshowViewModel : ViewModel() {
             Timber.i("All Experiences Load Error : $e.message")
         }
     }
+
+    fun loadForUser(uid: String?) {
+        try {
+            FirebaseDBManager.findAll(uid!!, experienceList)
+            Timber.i("User Experiences Load Success")
+        } catch (e: Exception) {
+            Timber.i("User Experiences Load Error : $e.message")
+        }
+    }
 }

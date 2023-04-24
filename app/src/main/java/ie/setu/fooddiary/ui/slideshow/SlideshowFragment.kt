@@ -2,10 +2,15 @@ package ie.setu.fooddiary.ui.slideshow
 
 import android.os.Bundle
 import android.view.*
-import android.widget.*
-import androidx.core.content.ContextCompat
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,7 +40,7 @@ class SlideshowFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentSlideshowBinding? = null
     private val binding get() = _binding!!
     private var markers: MutableList<Marker?> = mutableListOf()
-    private val loggedInViewModel: LoggedInViewModel by activityViewModels()
+    private val logInViewModel: LoggedInViewModel by activityViewModels()
 
     private lateinit var viewModel: SlideshowViewModel
 
@@ -52,18 +57,42 @@ class SlideshowFragment : Fragment(), OnMapReadyCallback {
         val mapFrag = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFrag.getMapAsync(this)
 
+        // Initial Loading of user's experiences
+        logInViewModel.liveFirebaseUser.observe(viewLifecycleOwner) { viewModel.loadForUser(it.uid) }
+
+        setupToolbar()
 
         return binding.root
     }
 
+    private fun setupToolbar() {
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.main, menu)
+                val toggle = menu.findItem(R.id.toggle_experiences)
+                toggle.actionView?.setOnClickListener {
+                    if ((it as SwitchCompat).isChecked) {
+                        viewModel.load()
+                    } else {
+                        viewModel.loadForUser(logInViewModel.liveFirebaseUser.value?.uid)
+                    }
+                }
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
     override fun onMapReady(map: GoogleMap) {
-
         resetMap(map)
-
         initializeMapSearch(map)
 
-        viewModel.observableExperienceList.observe(viewLifecycleOwner) { loadMap(map, it) }
-        viewModel.load()
+        // Draw map with markers each time experiences are loaded
+        viewModel.observableExperienceList.observe(viewLifecycleOwner) { loadMap(it, map) }
     }
 
     private fun initializeMapSearch(map: GoogleMap) {
@@ -78,17 +107,27 @@ class SlideshowFragment : Fragment(), OnMapReadyCallback {
             )
         )
 
-        val searchEditText =
-            autocompleteFragment.requireView()
-                .findViewById<EditText>(com.google.android.libraries.places.R.id.places_autocomplete_search_input)
+        createPlaceSelectedHandler(autocompleteFragment, map)
 
-        searchEditText?.setHintTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                androidx.appcompat.R.color.material_grey_600
-            )
-        )
+        createClearButtonHandler(autocompleteFragment, map)
+    }
 
+    private fun createClearButtonHandler(
+        autocompleteFragment: AutocompleteSupportFragment,
+        map: GoogleMap,
+    ) {
+        autocompleteFragment.requireView()
+            .findViewById<View>(com.google.android.libraries.places.R.id.places_autocomplete_clear_button)
+            .setOnClickListener {
+                autocompleteFragment.setText("")
+                fitMarkersInMap(markers, map)
+            }
+    }
+
+    private fun createPlaceSelectedHandler(
+        autocompleteFragment: AutocompleteSupportFragment,
+        map: GoogleMap,
+    ) {
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
 
@@ -109,39 +148,20 @@ class SlideshowFragment : Fragment(), OnMapReadyCallback {
                 Timber.e("Google map - Location selection error: ${status.statusMessage}")
             }
         })
-
-        autocompleteFragment.requireView()
-            .findViewById<View>(com.google.android.libraries.places.R.id.places_autocomplete_clear_button)
-            .setOnClickListener {
-                autocompleteFragment.setText("")
-                fitMarkersInMap(markers, map)
-            }
     }
 
-    private fun loadMap(map: GoogleMap, experiences: List<ExperienceModel>) {
+    private fun loadMap(experiences: List<ExperienceModel>, map: GoogleMap) {
 
-        val currentUserId = loggedInViewModel.liveFirebaseUser.value?.email
+        val currentUserId = logInViewModel.liveFirebaseUser.value?.email
 
         // Create markers on map
-        for (experience in experiences) {
-
-            val markerOptions = MarkerOptions()
-                .position(LatLng(experience.latitude, experience.longitude))
-                .title(experience.restaurantName)
-
-            // Red marker for self experiences, blue for other's
-            if (experience.userId == currentUserId) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            } else {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-            }
-
-            markers.add(map.addMarker(markerOptions))
-        }
-
-        fitMarkersInMap(markers, map)
+        createMarkers(experiences, currentUserId, map)
 
         // Show popup window on marker click
+        createPopupWindow(experiences, map)
+    }
+
+    private fun createPopupWindow(experiences: List<ExperienceModel>, map: GoogleMap) {
         map.setOnMarkerClickListener { marker ->
             val contentView = View.inflate(context, R.layout.popup_window, null)
 
@@ -173,6 +193,34 @@ class SlideshowFragment : Fragment(), OnMapReadyCallback {
 
             true
         }
+    }
+
+    private fun createMarkers(
+        experiences: List<ExperienceModel>,
+        currentUserId: String?,
+        map: GoogleMap,
+    ) {
+
+        map.clear()
+        markers.clear()
+
+        for (experience in experiences) {
+
+            val markerOptions = MarkerOptions()
+                .position(LatLng(experience.latitude, experience.longitude))
+                .title(experience.restaurantName)
+
+            // Red marker for self experiences, blue for other's
+            if (experience.userId == currentUserId) {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            } else {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            }
+
+            markers.add(map.addMarker(markerOptions))
+        }
+
+        fitMarkersInMap(markers, map)
     }
 
     override fun onDestroyView() {
