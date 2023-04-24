@@ -24,7 +24,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
@@ -33,6 +32,7 @@ import ie.setu.fooddiary.R
 import ie.setu.fooddiary.databinding.FragmentHomeBinding
 import ie.setu.fooddiary.models.ExperienceModel
 import ie.setu.fooddiary.ui.login.LoggedInViewModel
+import ie.setu.fooddiary.utils.resetMap
 import timber.log.Timber
 import java.util.*
 
@@ -58,7 +58,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         viewModel.observableStatus.observe(viewLifecycleOwner) { render(it) }
 
         // Google Maps
-        Places.initialize(requireContext(), getString(R.string.google_maps_key))
         val mapFrag = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFrag.getMapAsync(this)
 
@@ -115,7 +114,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         resetMap(googleMap)
 
-        // Set up the Google Places API autocomplete fragment
+        val autocompleteFragment = initializeMapSearch(googleMap)
+
+        val experience = args?.experience
+        if (experience != null) {
+            val latLng = LatLng(experience.latitude, experience.longitude)
+            val markerOptions = MarkerOptions().position(latLng).title(experience.restaurantName)
+            googleMap.clear()
+            googleMap.addMarker(markerOptions)
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            autocompleteFragment.setText(experience.restaurantName)
+        }
+    }
+
+    private fun initializeMapSearch(googleMap: GoogleMap): AutocompleteSupportFragment {
+
         val autocompleteFragment =
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
 
@@ -130,7 +143,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             )
         )
 
-        autocompleteFragment.setCountries("IE")
         autocompleteFragment.setTypesFilter(
             listOf(
                 "bakery",
@@ -154,15 +166,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 resetMap(googleMap)
             }
 
-        val experience = args?.experience
-        if (experience != null) {
-            val latLng = LatLng(experience.latitude, experience.longitude)
-            val markerOptions = MarkerOptions().position(latLng).title(experience.restaurantName)
-            googleMap.clear()
-            googleMap.addMarker(markerOptions)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-            autocompleteFragment.setText(experience.restaurantName)
-        }
+        return autocompleteFragment
     }
 
     private fun placeSelectionListener(
@@ -181,7 +185,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             val markerOptions = MarkerOptions().position(place.latLng!!).title(place.name)
             googleMap.clear()
             googleMap.addMarker(markerOptions)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.latLng!!, 15f))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.latLng!!, 15f))
 
             // Set the text of the AutocompleteSupportFragment to the selected place's name and address
             Handler(Looper.getMainLooper()).postDelayed({
@@ -192,12 +196,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         override fun onError(status: Status) {
             Timber.e("Google map - Location selection error: ${status.statusMessage}")
         }
-    }
-
-    private fun resetMap(map: GoogleMap) {
-        map.clear()
-        val defaultLatLng = LatLng(53.1424, -7.6921)
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLng, 6F))
     }
 
     private fun setOnSaveHandler() {

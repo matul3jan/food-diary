@@ -59,5 +59,12 @@
         <item name="android:gravity">center</item>
         <item name="android:textSize">28sp</item>
     </style>
+
+    <style name="ThemeOverlay.MySubTitleText" parent="Theme.FoodDiary">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+
     <!-- END Firebase Resources-->
 </resources>

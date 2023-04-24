@@ -15,7 +15,25 @@ object FirebaseDBManager : ExperienceStore {
     var database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
     override fun findAll(experienceList: MutableLiveData<List<ExperienceModel>>) {
-        TODO("Not yet implemented")
+        database.child("experiences")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                    Timber.i("Firebase Experience error : ${error.message}")
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val localList = ArrayList<ExperienceModel>()
+                    val children = snapshot.children
+                    children.forEach {
+                        val experience = it.getValue(ExperienceModel::class.java)
+                        localList.add(experience!!)
+                    }
+                    database.child("experiences")
+                        .removeEventListener(this)
+
+                    experienceList.value = localList
+                }
+            })
     }
 
     override fun findAll(userId: String, experienceList: MutableLiveData<List<ExperienceModel>>) {

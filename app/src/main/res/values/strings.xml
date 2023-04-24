@@ -9,7 +9,7 @@
 
     <string name="menu_home">Add Experience</string>
     <string name="menu_gallery">My Experiences</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_slideshow">Explore</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -85,5 +85,9 @@
     <string name="image">Image</string>
     <string name="restaurant">Restaurant</string>
     <string name="dish">Dish</string>
+    <string name="close_experience_popup">Close experience popup</string>
+    <string name="rating">Rating</string>
+    <string name="self_experiences">Self experiences</string>
+    <string name="other_s_experiences">Other\'s experiences</string>
 
 </resources>

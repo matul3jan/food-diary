@@ -62,6 +62,7 @@
             android:layout_below="@id/cuisine_spinner"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
+            android:contentDescription="@string/rating"
             android:numStars="5"
             android:rating="0"
             android:stepSize="1" />
@@ -90,8 +91,8 @@
             android:layout_height="150dp"
             android:layout_below="@+id/comment_edittext"
             android:layout_marginTop="16dp"
-            android:src="@drawable/ic_image_placeholder"
-            android:contentDescription="@string/dish_image_preview" />
+            android:contentDescription="@string/dish_image_preview"
+            android:src="@drawable/ic_image_placeholder" />
 
         <!-- Image upload button -->
         <Button
