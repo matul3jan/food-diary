@@ -63,10 +63,10 @@ Below git approach allowed for a structured and organized development process, w
 - If any bugs were found after release, they were treated as new issues and a similar approach was followed to fix them.
 - Once the bugs were fixed and tested, a new tagged release of the application was created.
 
+<hr>
+
 ### Personal statement
 
-Developing the Food Diary app was a challenging yet fulfilling experience for me, as I worked on it alone and learned a lot about Android app development. I had no prior experience in mobile app development, but I was able to learn and implement the necessary skills, including working with the Google Maps API and utilizing the MVVM pattern.
-
-Throughout the development process, I relied on Git for version control and found it to be an invaluable tool for managing my codebase. I also encountered an issue while implementing the feature to capture images from the camera within the application, but I was able to resolve it with the help of the Stack Overflow community.
+Developing the Food Diary app was a challenging yet fulfilling experience for me, as I worked on it alone and learned a lot about Android app development. I had no prior experience in mobile app development, but I was able to learn and implement the necessary skills, including working with the Google Maps API and utilizing the MVVM pattern. Throughout the development process, I relied on Git for version control and found it to be an invaluable tool for managing my codebase. I also encountered an issue while implementing the feature to capture images from the camera within the application, but I was able to resolve it with the help of the Stack Overflow community.
 
 Overall, developing the Food Diary app was an enriching journey that allowed me to grow as a developer and gain valuable experience in mobile app development.
