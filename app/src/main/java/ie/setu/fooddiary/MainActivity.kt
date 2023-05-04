@@ -2,7 +2,6 @@ package ie.setu.fooddiary
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -13,6 +12,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.google.android.libraries.places.api.Places
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
@@ -70,12 +71,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -102,6 +97,16 @@ class MainActivity : AppCompatActivity() {
         navHeaderBinding.navHeaderEmail.text = currentUser.email
         navHeaderBinding.navHeaderName.text =
             getString(R.string.nav_header_title, currentUser.displayName)
+
+        if (currentUser.photoUrl != null) {
+            Glide.with(this)
+                .load(currentUser.photoUrl)
+                .placeholder(R.drawable.ic_image_placeholder) // placeholder
+                .error(R.drawable.ic_image_error) // error image if load fails
+                .override(200, 200)
+                .transform(CircleCrop())
+                .into(navHeaderBinding.imageView)
+        }
     }
 
     fun signOut(@Suppress("UNUSED_PARAMETER") item: MenuItem) {

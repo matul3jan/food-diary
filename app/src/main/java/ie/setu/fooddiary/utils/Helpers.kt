@@ -1,6 +1,9 @@
 package ie.setu.fooddiary.utils
 
 import android.app.AlertDialog
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -9,6 +12,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import ie.setu.fooddiary.R
+import java.io.File
+import java.io.FileOutputStream
+
 
 fun createLoader(activity: FragmentActivity): AlertDialog {
     val loaderBuilder = AlertDialog.Builder(activity)
@@ -39,6 +45,7 @@ fun resetMap(map: GoogleMap) {
 }
 
 fun fitMarkersInMap(markers: MutableList<Marker?>, map: GoogleMap) {
+    if (markers.isEmpty()) return
     val builder = LatLngBounds.builder()
     for (marker in markers) {
         builder.include(marker!!.position)
@@ -62,4 +69,19 @@ fun isSystemInDarkMode(): Boolean {
         AppCompatDelegate.MODE_NIGHT_NO -> false
         else -> false
     }
+}
+
+fun getImageUri(context: Context, bitmap: Bitmap?): Uri {
+
+    val file = File(context.cacheDir, "image.jpg")
+    file.createNewFile()
+
+    // Convert bitmap to file
+    val out = FileOutputStream(file)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 90, out)
+    out.flush()
+    out.close()
+
+    // Convert file to uri
+    return Uri.fromFile(file)
 }
