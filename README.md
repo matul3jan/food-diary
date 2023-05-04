@@ -19,7 +19,7 @@ The Food Diary app is a mobile application that helps users plan, save, and shar
 
 ### UML Class Diagram
 
-<img width="795" alt="image" src="https://user-images.githubusercontent.com/26350749/236255457-024ef37a-38b6-4119-a4eb-683edd891f7b.png">
+<img width="1420" alt="image" src="https://user-images.githubusercontent.com/26350749/236260385-13e6c608-11d5-4be1-a67f-ca09fb8d2464.png">
 
 <hr>
 
