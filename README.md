@@ -7,7 +7,7 @@ The Food Diary app is a mobile application that helps users plan, save, and shar
 ### Functionality
 
 | Feature       | Description                                                                                                                                                                    | Tool                                |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------- |
+|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------|
 | Splash screen | The splash screen welcomes users to the app with a visually appealing interface.                                                                                               | -                                   |
 | Auth          | The user login/registration system provides an authentication mechanism for users to create an account or sign in to an existing one using their Google account.               | Firebase Auth (Email + Google)      |
 | Persistence   | The app will save user data, such as the food destinations they have visited, the dishes they tried, and their ratings, so they can revisit their experiences at a later time. | Firebase (Database + Cloud Storage) |
