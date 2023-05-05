@@ -19,10 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
@@ -32,6 +29,7 @@ import ie.setu.fooddiary.databinding.FragmentSlideshowBinding
 import ie.setu.fooddiary.models.ExperienceModel
 import ie.setu.fooddiary.ui.login.LoggedInViewModel
 import ie.setu.fooddiary.utils.fitMarkersInMap
+import ie.setu.fooddiary.utils.isSystemInDarkMode
 import ie.setu.fooddiary.utils.resetMap
 import timber.log.Timber
 
@@ -88,6 +86,15 @@ class SlideshowFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap) {
+
+        if (isSystemInDarkMode()) {
+            map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(), R.raw.map_night
+                )
+            )
+        }
+
         resetMap(map)
         initializeMapSearch(map)
 

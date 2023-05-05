@@ -25,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
@@ -35,6 +36,7 @@ import ie.setu.fooddiary.databinding.FragmentHomeBinding
 import ie.setu.fooddiary.models.ExperienceModel
 import ie.setu.fooddiary.ui.login.LoggedInViewModel
 import ie.setu.fooddiary.utils.getImageUri
+import ie.setu.fooddiary.utils.isSystemInDarkMode
 import ie.setu.fooddiary.utils.resetMap
 import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
@@ -115,6 +117,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+
+        if (isSystemInDarkMode()) {
+            googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(), R.raw.map_night
+                )
+            )
+        }
 
         resetMap(googleMap)
 
