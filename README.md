@@ -74,3 +74,13 @@ Developing the Food Diary app was a challenging yet fulfilling experience for me
 Additionally, I recognize that there is always room for improvement and growth. While I was able to implement a number of key features in the app, such as the ability for users to log their food and experiences, I unfortunately was not able to fully implement a social element where users could comment on experiences shared by other users. This is due to limitation of time and other work on other modules.
 
 Overall, developing the Food Diary app was an enriching journey that allowed me to grow as a developer and gain valuable experience in mobile app development.
+
+<hr>
+
+### References
+
+- [Night mode for Google maps?](https://stackoverflow.com/questions/39191867/night-mode-for-google-maps)
+- [Take picture and save it on internal storage in Android](https://stackoverflow.com/questions/59852426/take-picture-and-save-it-on-internal-storage-in-android)
+- [Capture Image from Camera and Display in Activity](https://stackoverflow.com/questions/5991319/capture-image-from-camera-and-display-in-activity)
+- [When I press back button and reopen my app it goes back to login screen but user is still logged in](https://stackoverflow.com/questions/71988351/when-i-press-back-button-and-reopen-my-app-it-goes-back-to-login-screen-but-user)
+- [How to pass a variable from Activity to Fragment, and pass it back?](https://stackoverflow.com/questions/17436298/how-to-pass-a-variable-from-activity-to-fragment-and-pass-it-back)
