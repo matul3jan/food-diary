@@ -1,3 +1,5 @@
+## [Demo video here](https://www.youtube.com/watch?v=Xyv-ZhZviQM)
+
 ###  Introduction
 
 The Food Diary app is a mobile application that helps users plan, save, and share their food experiences. The app uses the Google Maps API to display and explore nearby food options, allowing users to search for specific restaurants or cuisines.
@@ -68,5 +70,7 @@ Below git approach allowed for a structured and organized development process, w
 ### Personal statement
 
 Developing the Food Diary app was a challenging yet fulfilling experience for me, as I worked on it alone and learned a lot about Android app development. I had no prior experience in mobile app development, but I was able to learn and implement the necessary skills, including working with the Google Maps API and utilizing the MVVM pattern. Throughout the development process, I relied on Git for version control and found it to be an invaluable tool for managing my codebase. I also encountered an issue while implementing the feature to capture images from the camera within the application, but I was able to resolve it with the help of the Stack Overflow community.
+
+Additionally, I recognize that there is always room for improvement and growth. While I was able to implement a number of key features in the app, such as the ability for users to log their food and experiences, I unfortunately was not able to fully implement a social element where users could comment on experiences shared by other users. This is due to limitation of time and other work on other modules.
 
 Overall, developing the Food Diary app was an enriching journey that allowed me to grow as a developer and gain valuable experience in mobile app development.
